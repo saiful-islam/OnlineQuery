@@ -1,0 +1,78 @@
+﻿@using System.Data;
+@{
+    ViewBag.Title = "User Save States";
+    DataTable listofStates = (DataTable)ViewBag.listofStates;
+    DataTable listofScript = (DataTable)ViewBag.listofScript;
+}
+
+<h2>Saved States</h2>
+<table>
+    <thead>
+        <tr>
+            <th>State Name
+            </th>
+
+            <th>Connection Name
+            </th>
+            <th>Table Name
+            </th>
+            <th></th>
+        </tr>
+
+    </thead>
+    <tbody>
+        @for (int i = 0; i < listofStates.Rows.Count; i++)
+        {
+            <tr>
+                <td>@listofStates.Rows[i][0].ToString()
+                </td>
+                <td>@listofStates.Rows[i][1].ToString()
+                </td>
+                <td>@listofStates.Rows[i][2].ToString()
+                </td>
+
+                <td>
+                    @Html.ActionLink("Rename", "RenameState", new { stateName = listofStates.Rows[i][0].ToString(), connName = listofStates.Rows[i][1].ToString() }) |
+            @Html.ActionLink("Delete", "DeleteState", new { stateName = listofStates.Rows[i][0].ToString(), connName = listofStates.Rows[i][1].ToString() })
+                </td>
+            </tr> 
+        }
+    </tbody>
+</table>
+
+
+<h2>Saved Scripts</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Script Name
+            </th>
+
+            <th>Connection Name
+            </th>
+            <th></th>
+        </tr>
+
+    </thead>
+    <tbody>
+        @for (int i = 0; i < listofScript.Rows.Count; i++)
+        {
+            <tr>
+                <td>@listofScript.Rows[i][0].ToString()
+                </td>
+                <td>@listofScript.Rows[i][1].ToString()
+                </td>
+
+                <td>
+                    @Html.ActionLink("Rename", "RenameState", new { stateName = listofScript.Rows[i][0].ToString(), connName = listofScript.Rows[i][1].ToString() }) |
+            @Html.ActionLink("Delete", "DeleteState", new { stateName = listofScript.Rows[i][0].ToString(), connName = listofScript.Rows[i][1].ToString() })
+                </td>
+            </tr> 
+        }
+    </tbody>
+</table>
+
+
+
+
+

@@ -1,0 +1,33 @@
+﻿@model MIDASDataAnalysis.Models.tblUserInfo
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+
+<fieldset>
+    <legend>tblUserInfo</legend>
+    <br />
+    
+    <div class="display-field">
+       User Name : @Html.DisplayFor(model => model.UserName)
+    </div>
+
+   <br />
+    <div class="display-field">
+       Admin @Html.DisplayFor(model => model.isAdmin)
+    </div>
+    <br />
+    <div class="display-field">
+       Active @Html.DisplayFor(model => model.isActive)
+    </div>
+</fieldset>
+@using (Html.BeginForm()) {
+    <p>
+        <input type="submit" value="Delete" /> |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+}

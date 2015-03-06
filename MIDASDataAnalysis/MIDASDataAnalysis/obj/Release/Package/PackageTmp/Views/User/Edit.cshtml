@@ -1,0 +1,48 @@
+﻿@model MIDASDataAnalysis.Models.tblUserInfo
+
+@{
+    ViewBag.Title = "Permission";
+}
+
+<h2>Permission</h2>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+        <legend>tblUserInfo</legend>
+        <br />
+        @Html.HiddenFor(model => model.Id)
+
+        <div class="editor-label">
+            User Name
+        </div>
+        <div class="editor-field">
+            @Html.TextBoxFor(model => model.UserName, new { @readonly = "readonly" })
+            @Html.ValidationMessageFor(model => model.UserName)
+        </div>
+
+       <br />
+        <div class="editor-field">
+           Admin @Html.EditorFor(model => model.isAdmin)
+            @Html.ValidationMessageFor(model => model.isAdmin)
+        </div>
+        <br />
+        <div class="editor-field">
+          Active  @Html.EditorFor(model => model.isActive)
+            @Html.ValidationMessageFor(model => model.isActive)
+        </div>
+
+        <p>
+            <input type="submit" value="Save" />
+        </p>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

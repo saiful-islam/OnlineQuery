@@ -1,0 +1,116 @@
+﻿@model MIDASDataAnalysis.Models.tblUserInfo
+
+@{
+    ViewBag.Title = "Create";
+}
+
+
+<h2>Create</h2>
+
+@*@using (Html.BeginForm("")) {
+    @Html.ValidationSummary(true)
+
+    *@<fieldset>
+        <legend>tblUserInfo</legend>
+
+        <div class="editor-label">
+            User Name
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.UserName)
+            @Html.ValidationMessageFor(model => model.UserName)
+            <button onclick="Chk_Name();"> Check Name </button>
+        </div>
+        <div class="editor-label">
+            <input id="lbl_UserDetail" class="errortxt" type="text" value="" readonly="true" />
+        </div>
+      
+          <br />
+        
+        <div class="editor-field">
+            Admin @Html.EditorFor(model => model.isAdmin)
+            @Html.ValidationMessageFor(model => model.isAdmin)
+        </div>
+
+        <br />
+            
+       
+        <div class="editor-field">
+            Active @Html.EditorFor(model => model.isActive)
+            @Html.ValidationMessageFor(model => model.isActive)
+        </div>
+
+        <p>
+            <button onclick="submit();"> Create </button>
+            
+        </p>
+    </fieldset>
+@*}*@
+
+
+
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+<script type="text/javascript">
+
+    var ele = document.getElementById("UserName");
+    ele.oninput = function () {
+        document.getElementById('lbl_UserDetail').value = "";
+    }
+
+    function Chk_Name()
+    {
+        var user = [];
+        user.push(document.getElementById("UserName").value);
+        jQuery.ajax({
+            type: "POST",
+            url: '@Url.Action("CheckValidateUser", "User")',
+            dataType: "json",
+            contentType: "application/json;",
+            data: JSON.stringify(user),
+            success: function (data) {
+                document.getElementById('lbl_UserDetail').value = data;
+            },
+            failure: function (errMsg) {
+                alert(errMsg);
+            }
+        });
+    }
+    function submit()
+    {
+        var validate = document.getElementById('lbl_UserDetail').value;
+        if (validate == "Invalid User" || validate == "")
+        {
+            alert("First Validate User");
+            return;
+        }
+
+        var user = [];
+        user.push(document.getElementById("UserName").value);
+        user.push(document.getElementById("isAdmin").checked);
+        user.push(document.getElementById("isActive").checked);
+
+        jQuery.ajax({
+            type: "POST",
+            url: '@Url.Action("Create", "User")',
+            dataType: "json",
+            contentType: "application/json;",
+            data: JSON.stringify(user),
+            success: function (data) {
+                if (data != "Nothing") {
+                    window.location.href = '@Url.Action("Index", "User")';
+                }
+                else { alert("Provide Valid Data")}
+            },
+            failure: function (errMsg) {
+                alert(errMsg);
+            }
+        });
+    }
+</script>

@@ -1,0 +1,38 @@
+﻿@model MIDASDataAnalysis.Models.tblDBServer
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_PopLayout.cshtml";
+}
+
+<h2>Create</h2>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+        <legend>tblDBServer</legend>
+
+       <br />
+        <div class="editor-field">
+          Database Server :  @Html.EditorFor(model => model.DBServer)
+            @Html.ValidationMessageFor(model => model.DBServer)
+        </div>
+
+        <p>
+            <input type="submit" value="Create" />
+        </p>
+    </fieldset>
+}
+
+<div style="color:red;">
+    @ViewBag.exMessage
+</div>
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

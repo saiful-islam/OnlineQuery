@@ -1,0 +1,138 @@
+﻿@using System.Data;
+@{
+    ViewBag.Title = "UserConnection";
+    DataTable dtConnections = ViewBag.dtDBConnections;
+}
+
+<h2>Connection</h2>
+
+<div>
+    @*<span>Connection Name</span>*@
+    <br />
+
+    Connection Name : 
+    <select id="dbConnections" onchange="change_conn()">
+        @for (int i = 0; i < dtConnections.Rows.Count; i++)
+        {
+            <option value="@dtConnections.Rows[i][0].ToString()">@dtConnections.Rows[i][0].ToString()</option>
+        }
+    </select>
+
+    <br />
+    <br />
+    <table style="min-width: 710px; min-height: 100px;">
+        <thead>
+            <tr>
+                <th colspan="2">Select Table or Saved State </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="min-width: 350px; text-align: left;">Table or View : 
+    <select id="dbTables">
+    </select>
+                </td>
+                <td style="min-width: 350px; text-align: left;">Save States : 
+    <select id="dbSaveStates">
+    </select>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <br />
+    <br />
+    <button onclick="DBConnect()">Connect</button>
+</div>
+
+<script>
+    function change_conn() {
+        document.getElementById('dbTables').innerHTML = "";
+        document.getElementById('dbSaveStates').innerHTML = "";
+        var strConn = document.getElementById('dbConnections').value;
+        if (strConn.trim() == "") {
+            return;
+        }
+        var selected = [];
+        selected.push(strConn);
+        jQuery.ajax({
+            type: "POST",
+            url: '@Url.Action("GetTableName", "MIDAS")',
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(selected),
+            success: function (data) {
+                var arrData = data.split("~");
+                var arrTables = arrData[0].split(",");
+                var arrStates = arrData[1].split(",");
+                for (var i = 0; i < arrTables.length; i++) {
+                    var ele_option = document.createElement("option");
+                    ele_option.value = arrTables[i];
+
+                    var text = document.createTextNode(arrTables[i]);
+                    ele_option.appendChild(text);
+                    document.getElementById('dbTables').appendChild(ele_option);
+                }
+               
+                for (var i = 0; i < arrStates.length; i++) {
+                    var ele_option = document.createElement("option");
+                    ele_option.value = arrStates[i];
+
+                    var text = document.createTextNode(arrStates[i]);
+                    ele_option.appendChild(text);
+                    document.getElementById('dbSaveStates').appendChild(ele_option);
+                }
+
+            },
+            failure: function (errMsg) {
+                alert(errMsg);
+            }
+        });
+    }
+    
+    function DBConnect() {
+        var strConn = document.getElementById('dbConnections').value;
+        var strTbl = document.getElementById('dbTables').value;
+        var strState = document.getElementById('dbSaveStates').value;
+        if (strConn.trim() == "") {
+            alert("Connection can not empty");
+            return;
+        }
+        else if (strTbl.trim() == "" && strState.trim() == "") {
+            alert("Table & States can not empty! Al least select one");
+            return;
+        }
+        else if (strTbl.trim() != "") {
+            if (strState.trim() != "") {
+                alert("Table or States, select one");
+                return;
+            }
+        }
+        
+
+        var selected = [];
+        selected.push(strConn);
+        selected.push(strTbl);
+        selected.push(strState);
+
+        jQuery.ajax({
+            type: "POST",
+            url: '@Url.Action("PostConnection", "MIDAS")',
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(selected),
+            success: function (data) {
+                if (data == "View") {
+                    sessionStorage.setItem("script_data", "");
+                    document.location = '@Url.Action("Index", "MIDAS")';
+                }
+                else {
+                    sessionStorage.setItem("script_data", data);
+                    document.location = '@Url.Action("ScriptView", "MIDAS")';
+                }
+            },
+            failure: function (errMsg) {
+                alert(errMsg);
+            }
+        });
+        }
+</script>

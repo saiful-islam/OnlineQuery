@@ -1,0 +1,26 @@
+﻿@model MIDASDataAnalysis.Models.tblDBSchema
+
+@{
+    ViewBag.Title = "Delete";
+    Layout = "~/Views/Shared/_PopLayout.cshtml";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<fieldset>
+    <legend>tblDBSchema</legend>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.DBSchema)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.DBSchema)
+    </div>
+</fieldset>
+@using (Html.BeginForm()) {
+    <p>
+        <input type="submit" value="Delete" /> |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+}

@@ -1,0 +1,29 @@
+﻿@model MIDASDataAnalysis.Models.tblUserInfo
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>tblUserInfo</legend>
+    <br />
+    
+    <div class="display-field">
+       User Name : @Html.DisplayFor(model => model.UserName)
+    </div>
+
+   <br />
+    <div class="display-field">
+       Admin @Html.DisplayFor(model => model.isAdmin)
+    </div>
+    <br />
+    <div class="display-field">
+       Active @Html.DisplayFor(model => model.isActive)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

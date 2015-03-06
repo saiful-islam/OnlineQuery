@@ -1,0 +1,3 @@
+﻿CREATE LOGIN [SQLDataViewer]
+    WITH PASSWORD = N'xckintgdkfePzQdcnfScricCmsFT7_&#$!~<a;AzswpJinxk', SID = 0x4FCDAC36D1525F43AF11EE28057C0B41, DEFAULT_LANGUAGE = [us_english], CHECK_POLICY = OFF;
+

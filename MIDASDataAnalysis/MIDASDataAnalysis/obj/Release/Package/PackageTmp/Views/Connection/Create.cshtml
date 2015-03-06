@@ -1,0 +1,226 @@
+﻿@model MIDASDataAnalysis.Models.tblConnection
+
+@{
+    ViewBag.Title = "Create new connection";
+}
+
+<h2>Create new connection</h2>
+<br />
+<fieldset>
+    <legend>tblConnection</legend>
+
+    <br />
+    <div class="editor-field">
+       Connection Name : @Html.EditorFor(model => model.ConnectionName)
+        @Html.ValidationMessageFor(model => model.ConnectionName)
+    </div>
+    <br />
+    
+    <div class="editor-field">
+       Database Server : @Html.DropDownList("DBServerId", String.Empty)
+        @Html.ValidationMessageFor(model => model.DBServerId)
+        <input type="button" id="btnAddServerPopup" value="New" onclick="ShowServerPopUp();" style="height: 18px; font-size: small; border: 1px solid; margin: 2px; padding: 0px;" />
+    </div>
+    <br />
+   
+    <div class="editor-field">
+        Database Name : <select id="DBId" onchange="changeDB();">
+            
+        </select>
+    </div>
+    <br />
+    
+    <div class="editor-field">
+        Schema Name : <select id="DBSchemaId" onchange="changeSchema();">
+        </select>
+    </div>
+    <br />
+    <div class="editor-field">
+       Table or View : <select id="DBTableId">
+        </select>
+    </div>
+
+    <p>
+        <input type="button" value="Create" onclick="onCreate();" />
+    </p>
+</fieldset>
+
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+<script type="text/javascript">
+    ShowServerPopUp = function () {
+        window.showModalDialog('@Url.Action("Index", "Server")', "WindowPopup", 'width=400px,height=400px');
+        window.location.reload();
+    }
+    document.getElementById('DBServerId').onchange = function () {
+        document.getElementById('DBId').innerHTML = "";
+        document.getElementById('DBSchemaId').innerHTML = "";
+        document.getElementById('DBTableId').innerHTML = "";
+        var selectedEle = document.getElementById('DBServerId').options[document.getElementById('DBServerId').selectedIndex].text;
+        if (selectedEle != "") {
+            var server = [];
+            server.push(selectedEle);
+            jQuery.ajax({
+                type: "POST",
+                url: '@Url.Action("getDatabaseName", "Connection")',
+                 dataType: "json",
+                 contentType: "application/json;",
+                 data: JSON.stringify(server),
+                 success: function (data) {
+                     var arrDBName = data.split(',');
+
+                     if (arrDBName[0] == "~")
+                     {
+                         alert(data);
+                         return;
+                     }
+
+                     for (var i = 0; i < arrDBName.length; i++)
+                     {
+                         var eleoption = document.createElement("option");
+                         eleoption.value = arrDBName[i];
+
+                         var text = document.createTextNode(arrDBName[i]);
+                         eleoption.appendChild(text);
+
+                         document.getElementById('DBId').appendChild(eleoption);
+                     }
+                 },
+                 failure: function (errMsg) {
+                     alert(errMsg);
+                 }
+             });
+         }
+     }
+    function changeDB()
+    {
+        document.getElementById('DBSchemaId').innerHTML = "";
+        document.getElementById('DBTableId').innerHTML = "";
+        var selectedDBName = document.getElementById('DBId').value;
+        var selectedServer = document.getElementById('DBServerId').options[document.getElementById('DBServerId').selectedIndex].text;
+        if (selectedDBName.trim() != "") {
+            var sourceData = [];
+            sourceData.push(selectedServer);
+            sourceData.push(selectedDBName);
+            jQuery.ajax({
+                type: "POST",
+                url: '@Url.Action("getSchemaName", "Connection")',
+                dataType: "json",
+                contentType: "application/json;",
+                data: JSON.stringify(sourceData),
+                success: function (data) {
+                    var arrDBName = data.split(',');
+
+                    if (arrDBName[0] == "~") {
+                        alert(data);
+                        return;
+                    }
+
+                    for (var i = 0; i < arrDBName.length; i++) {
+                        var eleoption = document.createElement("option");
+                        eleoption.value = arrDBName[i];
+
+                        var text = document.createTextNode(arrDBName[i]);
+                        eleoption.appendChild(text);
+
+                        document.getElementById('DBSchemaId').appendChild(eleoption);
+                    }
+                },
+                failure: function (errMsg) {
+                    alert(errMsg);
+                }
+            });
+        }
+    }
+    function changeSchema()
+    {
+        document.getElementById('DBTableId').innerHTML = "";
+        var selectedDBName = document.getElementById('DBId').value;
+        var selectedSchemaName = document.getElementById('DBSchemaId').value;
+        var selectedServer = document.getElementById('DBServerId').options[document.getElementById('DBServerId').selectedIndex].text;
+        if (selectedSchemaName.trim() != "") {
+            var sourceData = [];
+            sourceData.push(selectedServer);
+            sourceData.push(selectedDBName);
+            sourceData.push(selectedSchemaName);
+            jQuery.ajax({
+                type: "POST",
+                url: '@Url.Action("getTableName", "Connection")',
+                dataType: "json",
+                contentType: "application/json;",
+                data: JSON.stringify(sourceData),
+                success: function (data) {
+                    var arrDBName = data.split(',');
+
+                    if (arrDBName[0] == "~") {
+                        alert(data);
+                        return;
+                    }
+
+                    for (var i = 0; i < arrDBName.length; i++) {
+                        var eleoption = document.createElement("option");
+                        eleoption.value = arrDBName[i];
+
+                        var text = document.createTextNode(arrDBName[i]);
+                        eleoption.appendChild(text);
+
+                        document.getElementById('DBTableId').appendChild(eleoption);
+                    }
+                },
+                failure: function (errMsg) {
+                    alert(errMsg);
+                }
+            });
+        }
+    }
+    function onCreate()
+    {
+        var strConnName = document.getElementById('ConnectionName').value;
+        var selectedDBName = document.getElementById('DBId').value;
+        var selectedSchemaName = document.getElementById('DBSchemaId').value;
+        var selectedTableName = document.getElementById('DBTableId').value;
+        var selectedServer = document.getElementById('DBServerId').options[document.getElementById('DBServerId').selectedIndex].text;
+
+        if (strConnName.trim() == "" || selectedTableName.trim() == "")
+        {
+            alert("Enter Connection Configuration Properly!!!");
+            return;
+        }
+
+        if (selectedTableName.trim() != "") {
+            var sourceData = [];
+            sourceData.push(selectedServer);
+            sourceData.push(selectedDBName);
+            sourceData.push(selectedSchemaName);
+            sourceData.push(selectedTableName);
+            sourceData.push(strConnName);
+            jQuery.ajax({
+                type: "POST",
+                url: '@Url.Action("Create", "Connection")',
+                dataType: "json",
+                contentType: "application/json;",
+                data: JSON.stringify(sourceData),
+                success: function (data) {
+                    var arrTables = data.split(",");
+                    if (arrTables[0] == "~") {
+                        alert(data);
+                    }
+                    else {
+                        document.location = '@Url.Action("Index", "Connection")';
+                    }
+                },
+                failure: function (errMsg) {
+                    alert(errMsg);
+                }
+            });
+        }
+    }
+</script>
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

@@ -1,0 +1,19 @@
+﻿@model MIDASDataAnalysis.Models.tblDBServer
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_PopLayout.cshtml";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>tblDBServer</legend>
+<br />
+    <div class="display-field">
+       Database Server : @Html.DisplayFor(model => model.DBServer)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Back to List", "Index")
+</p>

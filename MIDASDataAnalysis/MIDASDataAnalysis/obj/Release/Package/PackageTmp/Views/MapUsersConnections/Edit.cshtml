@@ -1,0 +1,41 @@
+﻿@model MIDASDataAnalysis.Models.MapUserConnection
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit</h2>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+        <legend>MapUserConnection</legend>
+
+        @Html.HiddenFor(model => model.Id)
+        <br />
+        
+        <div class="editor-field">
+           Connection Name : @Html.DropDownList("ConnID", String.Empty)
+            @Html.ValidationMessageFor(model => model.ConnID)
+        </div>
+
+       <br />
+        <div class="editor-field">
+          User :  @Html.DropDownList("UserID", String.Empty)
+            @Html.ValidationMessageFor(model => model.UserID)
+        </div>
+
+        <p>
+            <input type="submit" value="Save" />
+        </p>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

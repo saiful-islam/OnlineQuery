@@ -1,0 +1,64 @@
+﻿@model IEnumerable<MIDASDataAnalysis.Models.tblConnection>
+
+@{
+    ViewBag.Title = "Connections";
+}
+
+<h2>Connections</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table>
+    <tr>
+        @*<th>
+            @Html.DisplayNameFor(model => model.ConnId)
+        </th>*@
+        <th>
+            @Html.DisplayNameFor(model => model.ConnectionName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.tblDBServer.DBServer)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.tblDBName.DBName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.tblDBSchema.DBSchema)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.tblDBTable.DBTableOrView)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        @*<td>
+            @Html.DisplayFor(modelItem => item.ConnId)
+        </td>*@
+        <td>
+            @Html.DisplayFor(modelItem => item.ConnectionName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.tblDBServer.DBServer)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.tblDBName.DBName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.tblDBSchema.DBSchema)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.tblDBTable.DBTableOrView)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new {  id=item.ConnId  }) |
+            @Html.ActionLink("Rename", "Rename", new {  id=item.ConnId  }) |
+            @Html.ActionLink("Details", "Details", new {  id=item.ConnId  }) |
+            @Html.ActionLink("Delete", "Delete", new {  id=item.ConnId  })
+        </td>
+    </tr>
+}
+
+</table>

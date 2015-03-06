@@ -1,0 +1,82 @@
+﻿@model MIDASDataAnalysis.Models.tblConnection
+
+@{
+    ViewBag.Title = "Rename";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Rename</title>
+</head>
+<body>
+    <script src="~/Scripts/jquery-1.7.1.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <h2>Rename</h2>
+    @using (Html.BeginForm())
+    {
+        @Html.ValidationSummary(true)
+    
+        <fieldset>
+            <legend>tblConnection</legend>
+
+            @*   <div class="editor-label">
+            @Html.LabelFor(model => model.ConnId)
+        </div>*@
+            <div class="editor-field" style="display: none;">
+                @Html.EditorFor(model => model.ConnId)
+                @Html.ValidationMessageFor(model => model.ConnId)
+            </div>
+            <br />
+            
+            <div class="editor-field">
+               Connection Name : @Html.EditorFor(model => model.ConnectionName)
+                @Html.ValidationMessageFor(model => model.ConnectionName)
+            </div>
+
+            <div class="editor-label" style="display: none;">
+                @Html.LabelFor(model => model.DBServerId)
+            </div>
+            <div class="editor-field" style="display: none;">
+                @Html.EditorFor(model => model.DBServerId)
+                @Html.ValidationMessageFor(model => model.DBServerId)
+            </div>
+
+            <div class="editor-label" style="display: none;">
+                @Html.LabelFor(model => model.DBId)
+            </div>
+            <div class="editor-field" style="display: none;">
+                @Html.EditorFor(model => model.DBId)
+                @Html.ValidationMessageFor(model => model.DBId)
+            </div>
+
+            <div class="editor-label" style="display: none;">
+                @Html.LabelFor(model => model.DBSchemaId)
+            </div>
+            <div class="editor-field" style="display: none;">
+                @Html.EditorFor(model => model.DBSchemaId)
+                @Html.ValidationMessageFor(model => model.DBSchemaId)
+            </div>
+
+            <div class="editor-label" style="display: none;">
+                @Html.LabelFor(model => model.DBTableId)
+            </div>
+            <div class="editor-field" style="display: none;">
+                @Html.EditorFor(model => model.DBTableId)
+                @Html.ValidationMessageFor(model => model.DBTableId)
+            </div>
+
+            <p>
+                <input type="submit" value="Save" />
+            </p>
+        </fieldset>
+    }
+
+    <div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+</body>
+</html>

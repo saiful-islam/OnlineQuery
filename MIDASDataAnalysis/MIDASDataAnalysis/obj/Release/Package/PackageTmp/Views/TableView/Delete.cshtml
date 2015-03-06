@@ -1,0 +1,26 @@
+﻿@model MIDASDataAnalysis.Models.tblDBTable
+
+@{
+    ViewBag.Title = "Delete";
+    Layout = "~/Views/Shared/_PopLayout.cshtml";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<fieldset>
+    <legend>tblDBTable</legend>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.DBTableOrView)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.DBTableOrView)
+    </div>
+</fieldset>
+@using (Html.BeginForm()) {
+    <p>
+        <input type="submit" value="Delete" /> |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+}

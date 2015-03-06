@@ -1,0 +1,38 @@
+﻿@model MIDASDataAnalysis.Models.tblDBTable
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_PopLayout.cshtml";
+}
+
+<h2>Edit</h2>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+        <legend>tblDBTable</legend>
+
+        @Html.HiddenFor(model => model.Id)
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.DBTableOrView)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.DBTableOrView)
+            @Html.ValidationMessageFor(model => model.DBTableOrView)
+        </div>
+
+        <p>
+            <input type="submit" value="Save" />
+        </p>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

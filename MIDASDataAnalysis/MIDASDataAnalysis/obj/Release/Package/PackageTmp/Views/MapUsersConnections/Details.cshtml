@@ -1,0 +1,24 @@
+﻿@model MIDASDataAnalysis.Models.MapUserConnection
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>MapUserConnection</legend>
+    <br />
+    <div class="display-field">
+        Connection Name : @Html.DisplayFor(model => model.tblConnection.ConnectionName)
+    </div>
+
+   <br />
+    <div class="display-field">
+        User :  @Html.DisplayFor(model => model.tblUserInfo.UserName)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

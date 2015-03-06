@@ -1,0 +1,23 @@
+﻿@model MIDASDataAnalysis.Models.tblDBSchema
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_PopLayout.cshtml";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>tblDBSchema</legend>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.DBSchema)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.DBSchema)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

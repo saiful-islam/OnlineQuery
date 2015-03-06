@@ -1,0 +1,44 @@
+﻿@model MIDASDataAnalysis.Models.tblConnection
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>tblConnection</legend>
+    <br />
+    <div class="display-label" style="display:none">
+         @Html.DisplayNameFor(model => model.ConnId)
+    </div>
+    <div class="display-field" style="display:none">
+        @Html.DisplayFor(model => model.ConnId)
+    </div>
+
+    <div class="display-field">
+       Connection Name : @Html.DisplayFor(model => model.ConnectionName)
+    </div>
+    <br />
+    
+    <div class="display-field">
+       Database Server : @Html.DisplayFor(model => model.tblDBServer.DBServer)
+    </div>
+    <br />
+    <div class="display-field">
+      Database Name :  @Html.DisplayFor(model => model.tblDBName.DBName)
+    </div>
+
+    <br />
+    <div class="display-field">
+       Schema Name : @Html.DisplayFor(model => model.tblDBSchema.DBSchema)
+    </div>
+    <br />
+    <div class="display-field">
+      Table or View :   @Html.DisplayFor(model => model.tblDBTable.DBTableOrView)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.ConnId }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

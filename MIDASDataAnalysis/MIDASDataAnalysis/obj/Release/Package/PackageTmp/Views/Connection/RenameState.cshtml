@@ -1,0 +1,38 @@
+﻿@{
+    ViewBag.Title = "Rename State Name";
+}
+
+State Name : <input id="txtStateName"  value="@ViewBag.StateName" type="text" /><br />
+Connection Name : <label id="lblConnName">@ViewBag.ConnName</label><br />
+<p><button onclick="SaveState()"> Save</button>|  @Html.ActionLink("Back to List", "UserSaveStates","Connection")</p>
+<label id="lblStateName" style="display:none;">@ViewBag.StateName</label>
+
+<script type="text/javascript">
+    function SaveState()
+    {
+        var server = [];
+        server.push(document.getElementById("txtStateName").value);
+        server.push(document.getElementById("lblConnName").innerHTML.toString());
+        server.push(document.getElementById("lblStateName").innerHTML.toString());
+        jQuery.ajax({
+            type: "POST",
+            url: '@Url.Action("RenameState", "Connection")',
+                dataType: "json",
+                contentType: "application/json;",
+                data: JSON.stringify(server),
+                success: function (data) {
+                    if (data == "Correct") {
+                        document.location = '@Url.Action("UserSaveStates", "Connection")';
+                    }
+                    else {
+                        alert(data);
+                        return;
+                    }
+                },
+                failure: function (errMsg) {
+                    alert(errMsg);
+                }
+            });
+    }
+</script>
+

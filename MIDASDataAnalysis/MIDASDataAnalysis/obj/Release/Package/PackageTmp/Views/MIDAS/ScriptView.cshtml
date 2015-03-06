@@ -1,0 +1,111 @@
+﻿@{
+    ViewBag.Title = "ScriptView";
+}
+
+ Name :
+    <input type="text" id="ViewName"/>
+    <button id="btnSaveView" onclick="fun_SaveOnlyScript();">Save</button>
+
+
+<h2>Script:</h2>
+
+<textarea id="txtScript" style="width: 1000px; height: 300px;"> </textarea>
+<button onclick="fun_submit()">Submit</button>
+<br />
+<br />
+<h2>Output</h2>
+<div id="divFilterResult" class="FilterResultDiv">
+</div>
+<a download="Result.xls" href="#" onclick="return ExcellentExport.excel(this, 'tabResult', 'Result1');">Export to Excel</a>
+    <a download="Result.csv" href="#" onclick="return ExcellentExport.csv(this, 'tabResult');">Export to CSV</a>
+
+<script>
+    window.onload = function () {
+        document.getElementById('txtScript').value = sessionStorage.script_data;
+        document.getElementById('lblState_Name').innerHTML = '@Session["SaveScriptStateName"]';
+        document.getElementById('ViewName').value = '@Session["SaveScriptStateName"]';
+       
+    }
+
+    function Load_ResultGrid(data) {
+
+        document.getElementById('divFilterResult').innerHTML = "";
+
+        var domTable = document.createElement("table");
+        domTable.id = 'tabResult';
+        domTable.className = "sortable";
+        domTable.innerHTML = data;
+        document.getElementById('divFilterResult').appendChild(domTable);
+
+        $("#tabResult").tablesorter();
+
+    }
+
+    function fun_submit() {
+        document.getElementById('divFilterResult').innerHTML = "<h2>Loading..........</h2>";
+
+        var x = [];
+
+        x.push(document.getElementById('txtScript').value);
+        
+        jQuery.ajax({
+            type: "POST",
+            url: '@Url.Action("GetScriptResult", "MIDAS")',
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(x),
+            success: function (data) {
+                //document.getElementById('divFilterResult').innerHTML = data;
+                Load_ResultGrid(data);
+            },
+            failure: function (errMsg) {
+                alert(errMsg);
+            }
+        });
+    }
+
+    function fun_SaveOnlyScript() {
+        var selectedState = "";
+        try {
+            selectedState = document.getElementById("lblState_Name").innerHTML.trim();//document.getElementById('SaveStateList').value;
+        }
+        catch (ex) { }
+
+
+        var strViewName = document.getElementById('ViewName').value;
+
+        if (strViewName.trim() == "") {
+            alert("State Name could not empty!!")
+            return;
+        }
+
+        var strScriptValue = document.getElementById('txtScript').value;
+        var sourceData = [];
+        sourceData.push(strScriptValue);
+        sourceData.push(strViewName);
+        sourceData.push(selectedState);
+       
+
+        jQuery.ajax({
+            type: "POST",
+            url: '@Url.Action("SaveOnlyScript", "MIDAS")',
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(sourceData),
+            success: function (data) {
+                if (data != "") {
+                    sessionStorage.setItem("script_data", data);
+                    document.location = '@Url.Action("ScriptView", "MIDAS")';
+                    return;
+                }
+                else {
+                    alert(data);
+                }
+            },
+            failure: function (errMsg) {
+                alert(errMsg);
+            }
+        });
+    }
+
+</script>

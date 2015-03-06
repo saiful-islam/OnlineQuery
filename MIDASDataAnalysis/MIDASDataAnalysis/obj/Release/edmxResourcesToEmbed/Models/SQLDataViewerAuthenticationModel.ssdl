@@ -1,0 +1,164 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="SQLDataViewerAuthenticationModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+  <EntityContainer Name="SQLDataViewerAuthenticationModelStoreContainer">
+    <EntitySet Name="MapUserConnection" EntityType="SQLDataViewerAuthenticationModel.Store.MapUserConnection" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="tblConnection" EntityType="SQLDataViewerAuthenticationModel.Store.tblConnection" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="tblDBName" EntityType="SQLDataViewerAuthenticationModel.Store.tblDBName" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="tblDBSchema" EntityType="SQLDataViewerAuthenticationModel.Store.tblDBSchema" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="tblDBServer" EntityType="SQLDataViewerAuthenticationModel.Store.tblDBServer" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="tblDBTable" EntityType="SQLDataViewerAuthenticationModel.Store.tblDBTable" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="tblUserInfo" EntityType="SQLDataViewerAuthenticationModel.Store.tblUserInfo" store:Type="Tables" Schema="dbo" />
+    <AssociationSet Name="FK_MapUserConnection_MapConnection" Association="SQLDataViewerAuthenticationModel.Store.FK_MapUserConnection_MapConnection">
+      <End Role="tblConnection" EntitySet="tblConnection" />
+      <End Role="MapUserConnection" EntitySet="MapUserConnection" />
+    </AssociationSet>
+    <AssociationSet Name="FK_MapUserConnection_tblUserInfo" Association="SQLDataViewerAuthenticationModel.Store.FK_MapUserConnection_tblUserInfo">
+      <End Role="tblUserInfo" EntitySet="tblUserInfo" />
+      <End Role="MapUserConnection" EntitySet="MapUserConnection" />
+    </AssociationSet>
+    <AssociationSet Name="FK_tblAuthentication_tblDBName" Association="SQLDataViewerAuthenticationModel.Store.FK_tblAuthentication_tblDBName">
+      <End Role="tblDBName" EntitySet="tblDBName" />
+      <End Role="tblConnection" EntitySet="tblConnection" />
+    </AssociationSet>
+    <AssociationSet Name="FK_tblAuthentication_tblDBSchema" Association="SQLDataViewerAuthenticationModel.Store.FK_tblAuthentication_tblDBSchema">
+      <End Role="tblDBSchema" EntitySet="tblDBSchema" />
+      <End Role="tblConnection" EntitySet="tblConnection" />
+    </AssociationSet>
+    <AssociationSet Name="FK_tblAuthentication_tblDBServer" Association="SQLDataViewerAuthenticationModel.Store.FK_tblAuthentication_tblDBServer">
+      <End Role="tblDBServer" EntitySet="tblDBServer" />
+      <End Role="tblConnection" EntitySet="tblConnection" />
+    </AssociationSet>
+    <AssociationSet Name="FK_tblAuthentication_tblDBTable" Association="SQLDataViewerAuthenticationModel.Store.FK_tblAuthentication_tblDBTable">
+      <End Role="tblDBTable" EntitySet="tblDBTable" />
+      <End Role="tblConnection" EntitySet="tblConnection" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="MapUserConnection">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" Nullable="false" />
+    <Property Name="ConnID" Type="int" Nullable="false" />
+    <Property Name="UserID" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="tblConnection">
+    <Key>
+      <PropertyRef Name="ConnId" />
+    </Key>
+    <Property Name="ConnId" Type="int" Nullable="false" />
+    <Property Name="ConnectionName" Type="nvarchar" MaxLength="200" />
+    <Property Name="DBServerId" Type="int" Nullable="false" />
+    <Property Name="DBId" Type="int" Nullable="false" />
+    <Property Name="DBSchemaId" Type="int" Nullable="false" />
+    <Property Name="DBTableId" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="tblDBName">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" Nullable="false" />
+    <Property Name="DBName" Type="nvarchar" Nullable="false" MaxLength="200" />
+  </EntityType>
+  <EntityType Name="tblDBSchema">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" Nullable="false" />
+    <Property Name="DBSchema" Type="nvarchar" Nullable="false" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="tblDBServer">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" Nullable="false" />
+    <Property Name="DBServer" Type="nvarchar" Nullable="false" MaxLength="200" />
+  </EntityType>
+  <EntityType Name="tblDBTable">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" Nullable="false" />
+    <Property Name="DBTableOrView" Type="nvarchar" Nullable="false" MaxLength="200" />
+  </EntityType>
+  <EntityType Name="tblUserInfo">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" Nullable="false" />
+    <Property Name="UserName" Type="nvarchar" Nullable="false" MaxLength="200" />
+    <Property Name="isAdmin" Type="bit" Nullable="false" />
+    <Property Name="isActive" Type="bit" Nullable="false" />
+  </EntityType>
+  <Association Name="FK_MapUserConnection_MapConnection">
+    <End Role="tblConnection" Type="SQLDataViewerAuthenticationModel.Store.tblConnection" Multiplicity="1" />
+    <End Role="MapUserConnection" Type="SQLDataViewerAuthenticationModel.Store.MapUserConnection" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="tblConnection">
+        <PropertyRef Name="ConnId" />
+      </Principal>
+      <Dependent Role="MapUserConnection">
+        <PropertyRef Name="ConnID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_MapUserConnection_tblUserInfo">
+    <End Role="tblUserInfo" Type="SQLDataViewerAuthenticationModel.Store.tblUserInfo" Multiplicity="1" />
+    <End Role="MapUserConnection" Type="SQLDataViewerAuthenticationModel.Store.MapUserConnection" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="tblUserInfo">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="MapUserConnection">
+        <PropertyRef Name="UserID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_tblAuthentication_tblDBName">
+    <End Role="tblDBName" Type="SQLDataViewerAuthenticationModel.Store.tblDBName" Multiplicity="1" />
+    <End Role="tblConnection" Type="SQLDataViewerAuthenticationModel.Store.tblConnection" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="tblDBName">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="tblConnection">
+        <PropertyRef Name="DBId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_tblAuthentication_tblDBSchema">
+    <End Role="tblDBSchema" Type="SQLDataViewerAuthenticationModel.Store.tblDBSchema" Multiplicity="1" />
+    <End Role="tblConnection" Type="SQLDataViewerAuthenticationModel.Store.tblConnection" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="tblDBSchema">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="tblConnection">
+        <PropertyRef Name="DBSchemaId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_tblAuthentication_tblDBServer">
+    <End Role="tblDBServer" Type="SQLDataViewerAuthenticationModel.Store.tblDBServer" Multiplicity="1" />
+    <End Role="tblConnection" Type="SQLDataViewerAuthenticationModel.Store.tblConnection" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="tblDBServer">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="tblConnection">
+        <PropertyRef Name="DBServerId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_tblAuthentication_tblDBTable">
+    <End Role="tblDBTable" Type="SQLDataViewerAuthenticationModel.Store.tblDBTable" Multiplicity="1" />
+    <End Role="tblConnection" Type="SQLDataViewerAuthenticationModel.Store.tblConnection" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="tblDBTable">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="tblConnection">
+        <PropertyRef Name="DBTableId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>

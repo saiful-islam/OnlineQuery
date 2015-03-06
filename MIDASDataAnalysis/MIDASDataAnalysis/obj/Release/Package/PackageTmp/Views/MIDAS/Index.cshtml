@@ -1,0 +1,1221 @@
+﻿@using System.Data;
+@{
+    ViewBag.Title = "Home";
+    DataTable dtColumns = (DataTable)ViewBag.dtColumns;
+    DataTable dtCTY = (DataTable)ViewBag.dtCTY;
+    //DataTable dtSaveStates = (DataTable)ViewBag.dtSaveStates;
+}
+
+
+<div>
+    Name :
+    <input type="text" id="ViewName"/>
+    <button id="btnSaveView" onclick="fun_SaveScript();">Save</button>
+    @*Save States :
+    <select id="SaveStateList" onchange='OnChange_SaveStates();'>
+        @for (int i = 0; i < dtSaveStates.Rows.Count; i++)
+        {
+            <option value="@dtSaveStates.Rows[i][0].ToString()">@dtSaveStates.Rows[i][0].ToString()</option>
+        }
+    </select>*@
+    <label id="strSaveStateSession" style="display:none;">@Session["SaveStateName"]</label>
+    <div id="fullDiv">
+        <h3>Please select Columns</h3>
+        <br />
+        <div id="chkboxlist">
+            <span style="font-weight: bold;">
+                <input type="checkbox" name="All" id="chkboxlist_All" value="All" onclick="AllColSelection()" />[All]
+            </span>
+            @foreach (DataRow row in dtColumns.Rows)
+            {
+                <input type="checkbox" name="@row[0]" id="@row[0]" value="@row[0]" />@row[0]    
+            }
+
+        </div>
+        <br />
+        <h3>Filters</h3>
+
+        <div id="divFilter">
+            <div class="HeadFilterDiv">
+                Columns 
+            <div class="HeadFilterSelectedRemoveDiv">Remove </div>
+                <div class="HeadFilterSelectedValueDiv">Selected Values </div>
+                <div class="HeadFilterValueDiv">Values </div>
+            </div>
+
+            <div id="Attribute1" class="FilterDiv">
+
+                <div class="FilterSelectedRemoveDiv">
+                </div>
+
+                <div id="chkselectValue1" class="FilterSelectedValueDiv">
+                    <textarea id="search_chkselectValue1" class="SearchTextArea" oninput="search(this.id)"></textarea>
+                    <img id="img_chkselectValue1" src="~/Images/RemoveAll.jpg" onclick="AddRemoveAllFilterSelect(this.id)" />
+                    <br />
+                </div>
+
+                <div id="selectValue1" class="FilterValueDiv">
+
+                    <textarea id="search_selectValue1" class="SearchTextArea" oninput="search(this.id)"></textarea>
+                    <img id="img_selectValue1" src="~/Images/AddAll.jpg" onclick="AddRemoveAllFilterSelect(this.id)" />
+                    <br />
+                    @for (int i = 0; i < dtCTY.Rows.Count; i++)
+                    {
+                        string strvalue = "";
+                        if (dtCTY.Rows[i][0] == DBNull.Value)
+                        {
+                            strvalue = "<<NULL>>";
+                        }
+                        else if (dtCTY.Rows[i][0].ToString().Trim() == "")
+                        {
+                            strvalue = "<<BLANK>>";
+                        }
+                        else
+                        {
+                            strvalue = dtCTY.Rows[i][0].ToString();
+                        }
+
+                        if (i != dtCTY.Rows.Count - 1)
+                        {
+                        
+                        <span id="span_selectValue1_@strvalue" class="columns_selectValue1" title="span_selectValue1_@strvalue">
+                            <input type="checkbox" name="@strvalue" id="selectValue1_@strvalue" onclick="chk_changed(this.id)" value="@strvalue" />@strvalue
+                            <br />
+                        </span>
+                        }
+                        else
+                        {
+                        <span id="span_selectValue1_@strvalue" class="columns_selectValue1" title="span_selectValue1_Last" >
+                            <input type="checkbox" name="@strvalue" id="selectValue1_@strvalue" onclick="chk_changed(this.id)" value="@strvalue" />@strvalue
+                            <br />
+                        </span>
+                        }
+                    }
+
+                </div>
+
+                <div class="ColumnsDiv">
+                    <span>Filter 1 : </span>
+                    <select id="selectAttribute1" onchange='OnChange_FirstDropDown();'>
+                        @for (int i = 0; i < dtColumns.Rows.Count; i++)
+                        {
+                            if (i == 0)
+                            {
+                            <option value="@dtColumns.Rows[i][0].ToString()" selected="selected">@dtColumns.Rows[i][0].ToString()</option>
+                            }
+                            else
+                            {
+                            <option value="@dtColumns.Rows[i][0].ToString()">@dtColumns.Rows[i][0].ToString()</option>
+                            }
+                        }
+                    </select>
+                    <br />
+                    <span>Filtered as: </span>
+                    <select id="inOrNotinselectAttribute1" onchange='Refresh(this.id);'>
+                        <option value="in">Include</option>
+                        <option value="not in">Exclude</option>
+                    </select>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <br />
+    <br />
+
+    <button onclick="fun_AddFilter()">Add Filter</button>
+    <button onclick="fun_submit()">Submit</button>
+    <button id="btnViewScript" onclick="fun_ViewScript(this.id)">View Script</button>
+    <button id="btnEditScript" onclick="fun_ViewScript(this.id)">Edit Script</button>
+
+    <span id="SpanRowsCount"></span>
+    <br />
+    <br />
+    <div id="divFilterResult" class="FilterResultDiv">
+    </div>
+    <a download="Result.xls" href="#" onclick="return ExcellentExport.excel(this, 'tabResult', 'Result1');">Export to Excel</a>
+    <a download="Result.csv" href="#" onclick="return ExcellentExport.csv(this, 'tabResult');">Export to CSV</a>
+</div>
+
+
+<script>
+   
+    window.onload = function () {
+        document.getElementById('lblState_Name').innerHTML = '@Session["SaveStateName"]';
+        if (document.getElementById('lblState_Name').innerHTML == "" && '@Session["StrTableName"].ToString().Trim()'=="")
+        {
+            document.location = '@Url.Action("ScriptView", "MIDAS")';
+        }
+        try {
+            if (document.getElementById("strSaveStateSession").innerHTML.toString().trim() != "") {
+                OnChange_SaveStates();
+            }
+
+        } catch (ex) { }
+    }
+    
+    function getSelectIndexbyVal(id, yourvalue) {
+        var options = document.getElementById(id).options;
+        for (var i = 0; i < options.length; i++) {
+            if (options[i].value == yourvalue)
+                return i;
+        }
+    }
+
+    function LoadAttributeAllAction(id) {
+
+        document.getElementById(id).onchange = function () { fun_changeColumns_withIndex(this.id); }
+        document.getElementById("inOrNotin" + id).onchange = function () { Refresh(this.id); }
+
+  
+        if (id != "selectAttribute1") {
+            document.getElementById("remove" + id).onclick = function () { removeDiv(this.id); };
+            document.getElementById("ANDOR_" + id).onchange = function () { fun_changeAndOR(this.id); }
+        }
+        document.getElementById("search_" + id.replace("Attribute", "Value")).oninput = function () { search(this.id); }
+        document.getElementById("search_chk" + id.replace("Attribute", "Value")).oninput = function () { search(this.id); }
+        document.getElementById("img_" + id.replace("Attribute", "Value")).onclick = function () { AddRemoveAllFilterSelect(this.id); }
+        document.getElementById("img_chk" + id.replace("Attribute", "Value")).onclick = function () { AddRemoveAllFilterSelect(this.id); }
+
+        $('#' + id.replace("Attribute", "Value") + ' input').each(function () {
+            document.getElementById($(this).attr("id")).onclick = function () { chk_changed(this.id); }
+        });
+        $('#chk' + id.replace("Attribute", "Value") + ' input').each(function () {
+            document.getElementById($(this).attr("id")).checked = true;
+            document.getElementById($(this).attr("id")).onclick = function () { chk_changed(this.id); }
+
+        });
+
+
+    }
+
+    function OnChange_SaveStates() {
+        var selectedState = "";
+        try
+        {
+            selectedState = document.getElementById("strSaveStateSession").innerHTML.trim();//document.getElementById('SaveStateList').value;
+        }
+        catch (ex) { }
+        if (selectedState.trim() == "") {
+            document.location = '@Url.Action("Index", "MIDAS")';
+            return;
+        }
+        document.getElementById('ViewName').value = selectedState;
+        var sourceData = [];
+        sourceData.push(selectedState);
+
+        jQuery.ajax({
+            type: "POST",
+            url: '@Url.Action("LoadState", "MIDAS")',
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(sourceData),
+            success: function (data) {
+                
+                var arrData = data.split('~');
+                var arrAttr = arrData[1].split(',');
+                var arrCols = arrData[2].split(',');
+
+                document.getElementById('fullDiv').innerHTML = arrData[0];
+
+                for (var i = 0; i < arrCols.length; i++) {
+                    document.getElementById(arrCols[i]).checked = true;
+                }
+
+
+                attributes = [];
+
+                for (var i = 0; i < arrAttr.length; i++) {
+                     var id = arrAttr[i];
+                    
+                    attributes.push(id);
+                    i = i + 1;
+
+                    document.getElementById(id).selectedIndex = getSelectIndexbyVal(id, arrAttr[i]);
+                    i = i + 1;
+                    document.getElementById("inOrNotin" + id).selectedIndex = getSelectIndexbyVal("inOrNotin" + id, arrAttr[i]);
+                    if (id != "selectAttribute1") {
+                        i = i + 1;
+                        document.getElementById("ANDOR_" + id).selectedIndex = getSelectIndexbyVal("ANDOR_" + id, arrAttr[i]);
+                        i = i + 1;
+                        if (arrAttr[i] == "False") {
+                            document.getElementById("SubFilter_" + id).checked = false; Boolean()
+                        }
+                        else {
+                            document.getElementById("SubFilter_" + id).checked = true;
+                        }
+                    }
+                    i = i + 1;
+                    LoadAttributeAllAction(id);
+                }
+
+            },
+            failure: function (errMsg) {
+                alert(errMsg);
+            }
+        });
+    }
+
+    function fun_SaveScript() {
+        var selectedState = "";
+        try
+        {
+            selectedState = document.getElementById("strSaveStateSession").innerHTML.trim();//document.getElementById('SaveStateList').value;
+        }
+        catch (ex) { }
+       
+
+        var strViewName = document.getElementById('ViewName').value;
+
+        if (strViewName.trim() == "") {
+            alert("State Name could not empty!!")
+            return;
+        }
+
+        var innerDiv = document.getElementById('fullDiv').innerHTML;
+        var sourceData = [];
+        sourceData.push(innerDiv);
+        sourceData.push(strViewName);
+        sourceData.push(selectedState);
+        for (var i = 0; i < attributes.length; i++) {
+            sourceData.push(attributes[i]);
+            sourceData.push(document.getElementById(attributes[i]).value);
+            sourceData.push(document.getElementById("inOrNotin" + attributes[i]).value);
+            if (i != 0) {
+                sourceData.push(document.getElementById("ANDOR_" + attributes[i]).value);
+                sourceData.push(document.getElementById("SubFilter_" + attributes[i]).checked);
+            }
+            sourceData.push("|");
+
+        }
+        sourceData.push("~");
+
+        $('#chkboxlist input:checked').each(function () {
+            if ($(this).attr('name') != "All") {
+                sourceData.push($(this).attr('name'));
+            }
+        });
+
+        jQuery.ajax({
+            type: "POST",
+            url: '@Url.Action("SaveScript", "MIDAS")',
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(sourceData),
+            success: function (data) {
+                if (data == "Success") {
+                    document.location = '@Url.Action("Index", "MIDAS")';
+                    return;
+                }
+                else {
+                    alert(data);
+                    document.location = '@Url.Action("Index", "MIDAS")';
+                }
+            },
+            failure: function (errMsg) {
+                alert(errMsg);
+            }
+        });
+    }
+    function Refresh(id) {
+        var oid = id.replace("inOrNotin", "");
+        if (attributes.indexOf(oid) != attributes.length - 1) {
+            fun_changeAndOR("ANDOR_" + attributes[attributes.indexOf(oid) + 1]);
+        }
+    }
+
+    function fun_changeAndOR(id) {
+        var selectID = id.replace("ANDOR_", "");
+        if (document.getElementById(id).value == "AND") {
+            fun_changeColumns_withIndex(selectID);
+        }
+        else {
+            fun_changeColumns_withOutFilter(selectID);
+        }
+    }
+
+
+    function Load_ResultGrid(data) {
+
+        document.getElementById('divFilterResult').innerHTML = "";
+
+        var domTable = document.createElement("table");
+        domTable.id = 'tabResult';
+        domTable.className = "sortable";
+        domTable.innerHTML = data;
+        document.getElementById('divFilterResult').appendChild(domTable);
+
+        $("#tabResult").tablesorter();
+
+    }
+
+    function AddRemoveAllFilterSelect(id) {
+        
+        $('#' + id.replace("img_", "") + ' input').each(function () {
+            if (document.getElementById('span_' + $(this).attr('id')).style.display != 'none') {
+                chk_changed($(this).attr('id'));
+                
+            }
+        });
+    }
+
+    function AllColSelection() {
+        if (document.getElementById('chkboxlist_All').checked == true) {
+            $('#chkboxlist input').each(function () {
+                document.getElementById($(this).attr('id')).checked = true;
+            });
+
+        }
+        else {
+            $('#chkboxlist input').each(function () {
+                document.getElementById($(this).attr('id')).checked = false;
+            });
+        }
+    }
+
+    function search(id) {
+        var searchTerm = document.getElementById(id).value;
+        var r = new RegExp(searchTerm, 'i');
+        if (searchTerm != "") {
+
+            $("#" + id.replace("search_", "") + " span")
+            .show();
+
+            $("#" + id.replace("search_", "") + " span")
+             .hide()
+             .filter(function () { return $(this).text().match(r) })
+             .show();
+        }
+        else {
+            $("#" + id.replace("search_", "") + " span")
+             .show();
+        }
+
+    }
+
+    function fun_ViewScript(id) {
+        var selectedValidation = [];
+
+
+        $('#chk' + attributes[attributes.length - 1].replace("Attribute", "Value") + ' input').each(function () {
+            selectedValidation.push($(this).attr('name'));
+        });
+
+        if (selectedValidation.length == 0 && id == "btnViewScript") {
+            alert("Atleast one item selected")
+            return;
+        }
+
+
+
+        var selected = [];
+        $('#chkboxlist input:checked').each(function () {
+            if ($(this).attr('name') != "All") {
+                selected.push($(this).attr('name'));
+            }
+        });
+        if (selected.length == 0 && id == "btnViewScript") {
+            alert("Atleast one column selected");
+            return;
+        }
+        else if (selectedValidation.length == 0 && selected.length == 0 && id == "btnEditScript") {
+            sessionStorage.setItem("script_data", "");
+            document.location = '@Url.Action("ScriptView", "MIDAS")';
+            return;
+        }
+    document.getElementById('divFilterResult').innerHTML = '<h1>Loading............</h1>'
+
+    selected.push('---###---');
+
+        //first Columns
+    selected.push($('#' + attributes[0]).attr('value'));
+    selected.push('~');
+    selected.push($('#inOrNotin' + attributes[0]).attr('value'));
+    selected.push('~');
+    $('#chk' + attributes[0].replace("Attribute", "Value") + ' input').each(function () {
+        selected.push($(this).attr('name'));
+    });
+    selected.push('~');
+        //end first Columns
+
+    for (var i = 1; i < attributes.length; i++) {
+
+        selected.push($('#ANDOR_' + attributes[i]).attr('value'));
+        selected.push('~');
+        if (document.getElementById('SubFilter_' + attributes[i]).checked == true) {
+            selected.push($('#SubFilter_' + attributes[i]).attr('value'));
+            selected.push('~');
+        }
+
+        selected.push($('#' + attributes[i]).attr('value'));
+        selected.push('~');
+        selected.push($('#inOrNotin' + attributes[i]).attr('value'));
+        selected.push('~');
+        $('#chk' + attributes[i].replace("Attribute", "Value") + ' input').each(function () {
+            selected.push($(this).attr('name'));
+        });
+
+        selected.push('~');
+
+    }
+
+
+    jQuery.ajax({
+        type: "POST",
+        url: '@Url.Action("ViewScript", "MIDAS")',
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(selected),
+        success: function (data) {
+            if (id == "btnEditScript") {
+                sessionStorage.setItem("script_data", data);
+                document.location = '@Url.Action("ScriptView", "MIDAS")';
+            }
+            else {
+                document.getElementById('divFilterResult').innerHTML = data;
+            }
+        },
+        failure: function (errMsg) {
+            alert(errMsg);
+        }
+    });
+}
+
+function removeDiv(id) {
+    if (attributes.length > 1) {
+        document.getElementById(id.replace("removeselect", "")).remove();
+        attributes.splice(attributes.indexOf(id.replace("remove", "")), 1);
+    }
+}
+
+function Load_NextDiv_CheckedChanged(divID) {
+    var index_div = attributes.indexOf(divID);
+
+    if (index_div != attributes.length - 1) {
+        var i = index_div + 1;
+        var eleSelect = document.getElementById(attributes[i]);
+        if (eleSelect.selectedIndex != -1) {
+            fun_changeColumns_withIndex(attributes[i]);
+        }
+
+    }
+}
+
+function chk_changed(id) {
+
+    var arrSplit = id.split('_');
+    var span = document.getElementById("span_" + id);
+    var inputele = document.getElementById(id);
+
+    document.getElementById("span_" + id).remove();
+
+    var domSpan = document.createElement("span");
+    domSpan.id = span.id;
+    domSpan.title = span.title;
+
+    var element = document.createElement("input");
+    element.type = "checkbox";
+    element.name = inputele.name;
+    element.id = id;
+    if (span.className == "columns_" + arrSplit[0]) {
+        element.checked = true;
+
+    }
+    else {
+        element.checked = false;
+
+    }
+
+
+    element.value = inputele.value;
+    element.onclick = function () { chk_changed(this.id); }
+
+    domSpan.appendChild(element);
+
+    var idNextElement = span.title;
+
+    var mytext = document.createTextNode(inputele.value)
+    domSpan.appendChild(mytext);
+
+    var element = document.createElement("br");
+    domSpan.appendChild(element);
+
+    if (span.className == "columns_" + arrSplit[0]) {
+        domSpan.className = "columns_Selected_" + arrSplit[0];
+
+        document.getElementById("chk" + arrSplit[0]).appendChild(domSpan);
+    }
+    else {
+        domSpan.className = "columns_" + arrSplit[0];
+        //alert(idNextElement);
+        if (idNextElement == "span_" + arrSplit[0] + "_Last") {
+            document.getElementById(arrSplit[0]).appendChild(domSpan);
+        }
+        else {
+            try {
+                document.getElementById(arrSplit[0]).insertBefore(domSpan, document.getElementById(idNextElement));
+            }
+            catch (err) {
+                while (true) {
+                    try {
+                        var nextEle = document.getElementById(idNextElement);
+                        var idNextElement = nextEle.title;
+                        document.getElementById(arrSplit[0]).insertBefore(domSpan, document.getElementById(idNextElement));
+                        break;
+                    }
+                    catch (eleerr) {
+
+                    }
+                }
+            }
+        }
+    }
+
+    Load_NextDiv_CheckedChanged(arrSplit[0].replace("Value", "Attribute"));
+
+}
+
+function fun_submit() {
+
+    var selectedValidation = [];
+
+
+    $('#chk' + attributes[attributes.length - 1].replace("Attribute", "Value") + ' input').each(function () {
+        selectedValidation.push($(this).attr('name'));
+    });
+
+    if (selectedValidation.length == 0) {
+        alert("Atleast one item selected")
+        return;
+    }
+
+
+
+    var selected = [];
+    $('#chkboxlist input:checked').each(function () {
+        if ($(this).attr('name') != "All") {
+            selected.push($(this).attr('name'));
+        }
+    });
+    if (selected.length == 0) {
+        alert("Atleast one column selected");
+        return;
+    }
+    document.getElementById('divFilterResult').innerHTML = '<h1>Loading............</h1>'
+    selected.push('---###---');
+
+    //first Columns
+    selected.push($('#' + attributes[0]).attr('value'));
+    selected.push('~');
+    selected.push($('#inOrNotin' + attributes[0]).attr('value'));
+    selected.push('~');
+
+    $('#chk' + attributes[0].replace("Attribute", "Value") + ' input').each(function () {
+        selected.push($(this).attr('name'));
+    });
+    selected.push('~');
+    //end first Columns
+
+    for (var i = 1; i < attributes.length; i++) {
+
+        selected.push($('#ANDOR_' + attributes[i]).attr('value'));
+        selected.push('~');
+        if (document.getElementById('SubFilter_' + attributes[i]).checked == true) {
+            selected.push($('#SubFilter_' + attributes[i]).attr('value'));
+            selected.push('~');
+        }
+
+        selected.push($('#' + attributes[i]).attr('value'));
+        selected.push('~');
+        selected.push($('#inOrNotin' + attributes[i]).attr('value'));
+        selected.push('~');
+        $('#chk' + attributes[i].replace("Attribute", "Value") + ' input').each(function () {
+            selected.push($(this).attr('name'));
+        });
+
+        selected.push('~');
+
+    }
+
+
+    jQuery.ajax({
+        type: "POST",
+        url: '@Url.Action("PostSelectedColumns", "MIDAS")',
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(selected),
+        success: function (data) {
+            //document.getElementById('divFilterResult').innerHTML = data;
+            //var count = $('#divFilterResult tbody tr').length;
+            //document.getElementById('SpanRowsCount').innerHTML = "Rows : " + count;
+            Load_ResultGrid(data);
+        },
+        failure: function (errMsg) {
+            alert(errMsg);
+        }
+    });
+}
+
+function fun_AddFilter() {
+
+    var selected = [];
+
+
+    $('#chk' + attributes[attributes.length - 1].replace("Attribute", "Value") + ' input').each(function () {
+        selected.push($(this).attr('name'));
+    });
+
+    if (selected.length == 0) {
+        alert("Atleast one item selected")
+        return;
+    }
+
+    fun_addAttribute();
+
+    var div = document.createElement("div");
+    div.id = attributes[attributes.length - 1].substring(6, attributes[attributes.length - 1].length);
+    div.className = "FilterDiv";
+
+
+
+    var removeButtonDiv = document.createElement("div");
+    removeButtonDiv.className = "FilterSelectedRemoveDiv";
+
+    var removeButton = document.createElement("button");
+    removeButton.id = "remove" + attributes[attributes.length - 1];
+    removeButton.innerHTML = "Remove";
+    removeButton.onclick = function () { removeDiv(this.id); };
+
+    removeButtonDiv.appendChild(removeButton);
+    div.appendChild(removeButtonDiv);
+
+    var selectedChkDiv = document.createElement("div");
+    selectedChkDiv.id = "chk" + attributes[attributes.length - 1].replace("Attribute", "Value");
+    selectedChkDiv.className = "FilterSelectedValueDiv";
+
+    var searchInput = document.createElement("textarea");
+    searchInput.id = "search_chk" + attributes[attributes.length - 1].replace("Attribute", "Value");
+    searchInput.className = "SearchTextArea";
+    searchInput.oninput = function () { search(this.id); };
+    selectedChkDiv.appendChild(searchInput);
+
+    //<img id="img_chkselectValue1" src="~/Images/RemoveAll.jpg" onclick="AddRemoveAllFilterSelect(this.id)"/>
+
+    var imgRemoveAll = document.createElement("img");
+    imgRemoveAll.id = "img_chk" + attributes[attributes.length - 1].replace("Attribute", "Value");
+    imgRemoveAll.setAttribute('src', '../Images/RemoveAll.jpg');
+    imgRemoveAll.oninput = function () { AddRemoveAllFilterSelect(this.id); };
+    selectedChkDiv.appendChild(imgRemoveAll);
+
+    var elementbr = document.createElement("br");
+    selectedChkDiv.appendChild(elementbr);
+    div.appendChild(selectedChkDiv);
+
+    var valueDiv = document.createElement("div");
+    valueDiv.id = attributes[attributes.length - 1].replace("Attribute", "Value");
+    valueDiv.className = "FilterValueDiv";
+
+    //<img id="img_selectValue1" src="~/Images/AddAll.jpg" onclick="AddRemoveAllFilterSelect(this.id)" />
+
+
+    var searchInput = document.createElement("textarea");
+    searchInput.id = "search_" + attributes[attributes.length - 1].replace("Attribute", "Value");
+    searchInput.className = "SearchTextArea";
+    searchInput.oninput = function () { search(this.id); };
+    valueDiv.appendChild(searchInput);
+
+    var imgAddAll = document.createElement("img");
+    imgAddAll.id = "img_" + attributes[attributes.length - 1].replace("Attribute", "Value");
+    imgAddAll.setAttribute('src', '../Images/AddAll.jpg');
+    imgAddAll.oninput = function () { AddRemoveAllFilterSelect(this.id); };
+    valueDiv.appendChild(imgAddAll);
+
+    var elementbr = document.createElement("br");
+    valueDiv.appendChild(elementbr);
+
+    div.appendChild(valueDiv);
+
+
+    var divColumns = document.createElement("div");
+    divColumns.className = "ColumnsDiv";
+
+    var mytext = document.createTextNode("Filter " + parseInt(attributes[attributes.length - 1].replace("selectAttribute", "")) + " : ")
+    divColumns.appendChild(mytext)
+
+
+
+
+    var select = document.createElement("select");
+    select.id = attributes[attributes.length - 1];
+
+    $('#' + attributes[0] + ' option').each(function () {
+
+        var option = document.createElement("option");
+        option.value = $(this).attr('value');
+        var mytext = document.createTextNode($(this).attr('value'));
+        option.appendChild(mytext);
+        var br = document.createElement("br");
+        select.appendChild(br);
+        select.appendChild(option);
+
+    });
+
+
+
+    select.onchange = function () { fun_changeColumns_withIndex(this.id) };
+    select.selectedIndex = "-1";
+    divColumns.appendChild(select);
+
+
+    var br = document.createElement("br");
+    divColumns.appendChild(br);
+
+    //<span>Filtered by: </span>
+    //                <select id="inOrNotinSelectAttribute1" onchange='OnChange_FirstDropDown();'>
+    //                    <option value="in">include</option>
+    //                    <option value="not in">Exclude</option>
+    //                </select>
+
+    var mytext = document.createTextNode("Filtered as: ")
+    divColumns.appendChild(mytext)
+
+    var select = document.createElement("select");
+    select.id = "inOrNotin" + attributes[attributes.length - 1];
+    select.onchange = function () { Refresh(this.id) };
+
+    var option = document.createElement("option");
+    option.value = "in";
+    var mytext = document.createTextNode("Include");
+    option.appendChild(mytext);
+    var br = document.createElement("br");
+    select.appendChild(br);
+    select.appendChild(option);
+
+    var option = document.createElement("option");
+    option.value = "not in";
+    var mytext = document.createTextNode("Exclude");
+    option.appendChild(mytext);
+    var br = document.createElement("br");
+    select.appendChild(br);
+    select.appendChild(option);
+
+    divColumns.appendChild(select);
+
+    //var butt = document.createElement("button");
+    //butt.id = "Reload_" + attributes[attributes.length - 1];
+    //butt.onclick = function () { Refresh(this.id); };
+    //var mytext = document.createTextNode("Refresh");
+    //butt.appendChild(mytext);
+    //divColumns.appendChild(butt);
+
+
+    var br = document.createElement("br");
+    divColumns.appendChild(br);
+
+    var mytext = document.createTextNode("Select Operations : ")
+    divColumns.appendChild(mytext)
+
+
+
+    var select = document.createElement("select");
+    select.id = "ANDOR_" + attributes[attributes.length - 1];
+    select.onchange = function () { fun_changeAndOR(this.id) };
+
+    var option = document.createElement("option");
+    option.value = "AND";
+    var mytext = document.createTextNode("AND");
+    option.appendChild(mytext);
+    var br = document.createElement("br");
+    select.appendChild(br);
+    select.appendChild(option);
+
+    var option = document.createElement("option");
+    option.value = "OR";
+    var mytext = document.createTextNode("OR");
+    option.appendChild(mytext);
+    var br = document.createElement("br");
+    select.appendChild(br);
+    select.appendChild(option);
+
+    divColumns.appendChild(select);
+
+    var br = document.createElement("br");
+    divColumns.appendChild(br);
+
+    var option = document.createElement("input");
+    option.type = "checkbox";
+    option.value = "isSubFilter";
+    option.id = "SubFilter_" + attributes[attributes.length - 1];
+    divColumns.appendChild(option);
+
+    var mytext = document.createTextNode("  is Sub-Filter?");
+    divColumns.appendChild(mytext);
+
+    div.appendChild(divColumns);
+
+    document.getElementById('divFilter').appendChild(div);
+
+}
+
+
+function OnChange_FirstDropDown() {
+
+    var selectedAttributeValues = [];
+
+    $('#chk' + attributes[0].replace("Attribute", "Value") + ' input').each(function () {
+        selectedAttributeValues.push($(this).attr('id'));
+
+    });
+
+    document.getElementById('chk' + attributes[0].replace("Attribute", "Value")).innerHTML = "";
+
+    var searchInput = document.createElement("textarea");
+    searchInput.id = "search_chk" + attributes[0].replace("Attribute", "Value");
+    searchInput.className = "SearchTextArea";
+    searchInput.oninput = function () { search(this.id); };
+    document.getElementById('chk' + attributes[0].replace("Attribute", "Value")).appendChild(searchInput);
+
+
+    var imgRemoveAll = document.createElement("img");
+    imgRemoveAll.id = "img_chk" + attributes[0].replace("Attribute", "Value");
+    imgRemoveAll.setAttribute('src', '../Images/RemoveAll.jpg');
+    imgRemoveAll.onclick = function () { AddRemoveAllFilterSelect(this.id); };
+    document.getElementById('chk' + attributes[0].replace("Attribute", "Value")).appendChild(imgRemoveAll);
+
+
+    var elementbr = document.createElement("br");
+    document.getElementById('chk' + attributes[0].replace("Attribute", "Value")).appendChild(elementbr);
+
+    var selected = [];
+
+    selected.push($('#selectAttribute1').attr('value'));
+
+    jQuery.ajax({
+        type: "POST",
+        url: '@Url.Action("SelectedColumn", "MIDAS")',
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(selected),
+        success: function (data) {
+            document.getElementById("selectValue1").innerHTML = "";
+
+            var searchInput = document.createElement("textarea");
+            searchInput.id = "search_" + attributes[0].replace("Attribute", "Value");
+            searchInput.className = "SearchTextArea";
+            searchInput.oninput = function () { search(this.id); };
+            document.getElementById("selectValue1").appendChild(searchInput);
+
+            var imgAddAll = document.createElement("img");
+            imgAddAll.id = "img_" + attributes[0].replace("Attribute", "Value");
+            imgAddAll.setAttribute('src', '../Images/AddAll.jpg');
+            imgAddAll.onclick = function () { AddRemoveAllFilterSelect(this.id); };
+            document.getElementById("selectValue1").appendChild(imgAddAll);
+
+            var elementbr = document.createElement("br");
+            document.getElementById("selectValue1").appendChild(elementbr);
+
+
+            var arrdata = data.split('|');
+
+            for (var i = 0; i < arrdata.length; i++) {
+                var isSelected = selectedAttributeValues.indexOf(attributes[0].replace("Attribute", "Value") + "_" + arrdata[i]);
+
+                var elementSpan = document.createElement("span");
+                elementSpan.id = "span_" + attributes[0].replace("Attribute", "Value") + "_" + arrdata[i];
+                elementSpan.className = "columns_" + attributes[0].replace("Attribute", "Value");
+
+                if (i != arrdata.length - 1) {
+                    elementSpan.title = "span_" + attributes[0].replace("Attribute", "Value") + "_" + arrdata[i + 1];
+                }
+                else {
+                    elementSpan.title = "span_" + attributes[0].replace("Attribute", "Value") + "_Last";
+                }
+
+                var element = document.createElement("input");
+                element.type = "checkbox";
+                element.name = arrdata[i];
+                if (isSelected != -1) {
+                    element.checked = true;
+                }
+                element.id = attributes[0].replace("Attribute", "Value") + "_" + arrdata[i];
+                element.value = arrdata[i];
+                element.onclick = function () { chk_changed(this.id); }
+
+                elementSpan.appendChild(element);
+
+                var mytext = document.createTextNode(arrdata[i])
+
+                elementSpan.appendChild(mytext);
+
+                var element = document.createElement("br");
+                elementSpan.appendChild(element);
+                if (isSelected == -1) {
+                    document.getElementById(attributes[0].replace("Attribute", "Value")).appendChild(elementSpan)
+                }
+                else {
+                    document.getElementById('chk' + attributes[0].replace("Attribute", "Value")).appendChild(elementSpan)
+                }
+            }
+
+        },
+        failure: function (errMsg) {
+            alert(errMsg);
+        }
+    });
+}
+
+function fun_changeColumns_withIndex(id) {
+
+    if (document.getElementById('ANDOR_' + id).value == "OR") {
+
+        fun_changeColumns_withOutFilter(id);
+        return;
+    }
+    var attrIndex = attributes.indexOf(id);
+    var selectedAttributeValues = [];
+
+    $('#chk' + attributes[attrIndex].replace("Attribute", "Value") + ' input').each(function () {
+        selectedAttributeValues.push($(this).attr('id'));
+
+    });
+
+    if (selectedAttributeValues.length != 0) {
+        document.getElementById('chk' + attributes[attrIndex].replace("Attribute", "Value")).innerHTML = "<h2>Loading......</h2>";
+    }
+
+    var selected = [];
+
+    for (var i = 0; i < attrIndex; i++) {
+
+        selected.push($('#' + attributes[i]).attr('value'));
+        selected.push('~');
+        selected.push($('#inOrNotin' + attributes[i]).attr('value'));
+        selected.push('~');
+        $('#chk' + attributes[i].replace("Attribute", "Value") + ' input').each(function () {
+            selected.push($(this).attr('name'));
+
+        });
+
+        selected.push('~');
+
+    }
+    selected.push('---###---')
+
+    document.getElementById(attributes[attrIndex].replace("Attribute", "Value")).innerHTML = "<h2>Loading......</h2>";
+
+    selected.push($('#' + attributes[attrIndex]).attr('value'));
+
+    jQuery.ajax({
+        type: "POST",
+        url: '@Url.Action("SelectedColumnAndValue", "MIDAS")',
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(selected),
+        success: function (data) {
+            document.getElementById(attributes[attrIndex].replace("Attribute", "Value")).innerHTML = "";
+            var arrdata = data.split('|');
+
+            var searchInput = document.createElement("textarea");
+            searchInput.id = "search_" + attributes[attrIndex].replace("Attribute", "Value");
+            searchInput.className = "SearchTextArea";
+            searchInput.oninput = function () { search(this.id); };
+            document.getElementById(attributes[attrIndex].replace("Attribute", "Value")).appendChild(searchInput);
+
+
+            var imgAddAll = document.createElement("img");
+            imgAddAll.id = "img_" + attributes[attrIndex].replace("Attribute", "Value");
+            imgAddAll.setAttribute('src', '../Images/AddAll.jpg');
+            imgAddAll.onclick = function () { AddRemoveAllFilterSelect(this.id); };
+            document.getElementById(attributes[attrIndex].replace("Attribute", "Value")).appendChild(imgAddAll);
+
+
+
+            var elementbr = document.createElement("br");
+            document.getElementById(attributes[attrIndex].replace("Attribute", "Value")).appendChild(elementbr);
+
+            document.getElementById('chk' + attributes[attrIndex].replace("Attribute", "Value")).innerHTML = "";
+
+            var searchInput = document.createElement("textarea");
+            searchInput.id = "search_chk" + attributes[attributes.length - 1].replace("Attribute", "Value");
+            searchInput.className = "SearchTextArea";
+            searchInput.oninput = function () { search(this.id); };
+            document.getElementById('chk' + attributes[attrIndex].replace("Attribute", "Value")).appendChild(searchInput);
+
+            var imgRemoveAll = document.createElement("img");
+            imgRemoveAll.id = "img_chk" + attributes[attrIndex].replace("Attribute", "Value");
+            imgRemoveAll.setAttribute('src', '../Images/RemoveAll.jpg');
+            imgRemoveAll.onclick = function () { AddRemoveAllFilterSelect(this.id); };
+            document.getElementById('chk' + attributes[attrIndex].replace("Attribute", "Value")).appendChild(imgRemoveAll);
+
+
+
+            var elementbr = document.createElement("br");
+            document.getElementById('chk' + attributes[attrIndex].replace("Attribute", "Value")).appendChild(elementbr);
+
+
+            for (var i = 0; i < arrdata.length; i++) {
+
+                var isSelected = selectedAttributeValues.indexOf(attributes[attrIndex].replace("Attribute", "Value") + "_" + arrdata[i]);
+
+                var elementSpan = document.createElement("span");
+                elementSpan.id = "span_" + attributes[attrIndex].replace("Attribute", "Value") + "_" + arrdata[i];
+                elementSpan.className = "columns_" + attributes[attrIndex].replace("Attribute", "Value");
+
+                if (i != arrdata.length - 1) {
+                    elementSpan.title = "span_" + attributes[attrIndex].replace("Attribute", "Value") + "_" + arrdata[i + 1];
+                }
+                else {
+                    elementSpan.title = "span_" + attributes[attrIndex].replace("Attribute", "Value") + "_Last";
+
+                }
+                var element = document.createElement("input");
+                element.type = "checkbox";
+                element.name = arrdata[i];
+                element.id = attributes[attrIndex].replace("Attribute", "Value") + "_" + arrdata[i];
+                element.value = arrdata[i];
+                if (isSelected != -1) {
+                    element.checked = true;
+                }
+                element.onclick = function () { chk_changed(this.id); }
+                elementSpan.appendChild(element);
+
+                var mytext = document.createTextNode(arrdata[i])
+
+                elementSpan.appendChild(mytext);
+
+                var element = document.createElement("br");
+                elementSpan.appendChild(element);
+                if (isSelected == -1) {
+                    document.getElementById(attributes[attrIndex].replace("Attribute", "Value")).appendChild(elementSpan)
+                }
+                else {
+
+                    document.getElementById('chk' + attributes[attrIndex].replace("Attribute", "Value")).appendChild(elementSpan)
+                }
+            }
+
+        },
+        failure: function (errMsg) {
+            alert(errMsg);
+        }
+    });
+
+
+}
+
+function fun_changeColumns_withOutFilter(id) {
+
+    var attrIndex = attributes.indexOf(id);
+    var selectedAttributeValues = [];
+
+    $('#chk' + attributes[attrIndex].replace("Attribute", "Value") + ' input').each(function () {
+        selectedAttributeValues.push($(this).attr('id'));
+
+    });
+    var selected = [];
+
+
+    document.getElementById(attributes[attrIndex].replace("Attribute", "Value")).innerHTML = "<h2>Loading......</h2>";
+
+    selected.push($('#' + attributes[attrIndex]).attr('value'));
+
+    jQuery.ajax({
+        type: "POST",
+        url: '@Url.Action("SelectedColumn", "MIDAS")',
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(selected),
+        success: function (data) {
+
+            document.getElementById(attributes[attrIndex].replace("Attribute", "Value")).innerHTML = "";
+            var arrdata = data.split('|');
+
+            var searchInput = document.createElement("textarea");
+            searchInput.id = "search_" + attributes[attrIndex].replace("Attribute", "Value");
+            searchInput.className = "SearchTextArea";
+            searchInput.oninput = function () { search(this.id); };
+            document.getElementById(attributes[attrIndex].replace("Attribute", "Value")).appendChild(searchInput);
+
+
+            var imgAddAll = document.createElement("img");
+            imgAddAll.id = "img_" + attributes[attrIndex].replace("Attribute", "Value");
+            imgAddAll.setAttribute('src', '../Images/AddAll.jpg');
+            imgAddAll.onclick = function () { AddRemoveAllFilterSelect(this.id); };
+            document.getElementById(attributes[attrIndex].replace("Attribute", "Value")).appendChild(imgAddAll);
+
+
+
+            var elementbr = document.createElement("br");
+            document.getElementById(attributes[attrIndex].replace("Attribute", "Value")).appendChild(elementbr);
+
+            document.getElementById('chk' + attributes[attrIndex].replace("Attribute", "Value")).innerHTML = "";
+
+            var searchInput = document.createElement("textarea");
+            searchInput.id = "search_chk" + attributes[attributes.length - 1].replace("Attribute", "Value");
+            searchInput.className = "SearchTextArea";
+            searchInput.oninput = function () { search(this.id); };
+            document.getElementById('chk' + attributes[attrIndex].replace("Attribute", "Value")).appendChild(searchInput);
+
+            var imgRemoveAll = document.createElement("img");
+            imgRemoveAll.id = "img_chk" + attributes[attrIndex].replace("Attribute", "Value");
+            imgRemoveAll.setAttribute('src', '../Images/RemoveAll.jpg');
+            imgRemoveAll.onclick = function () { AddRemoveAllFilterSelect(this.id); };
+            document.getElementById('chk' + attributes[attrIndex].replace("Attribute", "Value")).appendChild(imgRemoveAll);
+
+
+
+            var elementbr = document.createElement("br");
+            document.getElementById('chk' + attributes[attrIndex].replace("Attribute", "Value")).appendChild(elementbr);
+
+
+            for (var i = 0; i < arrdata.length; i++) {
+
+                var isSelected = selectedAttributeValues.indexOf(attributes[attrIndex].replace("Attribute", "Value") + "_" + arrdata[i]);
+
+                var elementSpan = document.createElement("span");
+                elementSpan.id = "span_" + attributes[attrIndex].replace("Attribute", "Value") + "_" + arrdata[i];
+                elementSpan.className = "columns_" + attributes[attrIndex].replace("Attribute", "Value");
+
+                if (i != arrdata.length - 1) {
+                    elementSpan.title = "span_" + attributes[attrIndex].replace("Attribute", "Value") + "_" + arrdata[i + 1];
+                }
+                else {
+                    elementSpan.title = "span_" + attributes[attrIndex].replace("Attribute", "Value") + "_Last";
+
+                }
+                var element = document.createElement("input");
+                element.type = "checkbox";
+                element.name = arrdata[i];
+                element.id = attributes[attrIndex].replace("Attribute", "Value") + "_" + arrdata[i];
+                element.value = arrdata[i];
+                if (isSelected != -1) {
+                    element.checked = true;
+                }
+                element.onclick = function () { chk_changed(this.id); }
+                elementSpan.appendChild(element);
+
+                var mytext = document.createTextNode(arrdata[i])
+
+                elementSpan.appendChild(mytext);
+
+                var element = document.createElement("br");
+                elementSpan.appendChild(element);
+                if (isSelected == -1) {
+                    document.getElementById(attributes[attrIndex].replace("Attribute", "Value")).appendChild(elementSpan)
+                }
+                else {
+
+                    document.getElementById('chk' + attributes[attrIndex].replace("Attribute", "Value")).appendChild(elementSpan)
+                }
+            }
+
+        },
+        failure: function (errMsg) {
+            alert(errMsg);
+        }
+    });
+
+
+}
+</script>
+

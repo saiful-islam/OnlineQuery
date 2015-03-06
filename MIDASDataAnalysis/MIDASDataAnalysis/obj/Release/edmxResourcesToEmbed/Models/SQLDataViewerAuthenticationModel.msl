@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="SQLDataViewerAuthenticationModelStoreContainer" CdmEntityContainer="SQLDataViewerAuthenticationEntities">
+    <EntitySetMapping Name="MapUserConnections">
+      <EntityTypeMapping TypeName="SQLDataViewerAuthenticationModel.MapUserConnection">
+        <MappingFragment StoreEntitySet="MapUserConnection">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="ConnID" ColumnName="ConnID" />
+          <ScalarProperty Name="UserID" ColumnName="UserID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="tblConnections">
+      <EntityTypeMapping TypeName="SQLDataViewerAuthenticationModel.tblConnection">
+        <MappingFragment StoreEntitySet="tblConnection">
+          <ScalarProperty Name="ConnId" ColumnName="ConnId" />
+          <ScalarProperty Name="ConnectionName" ColumnName="ConnectionName" />
+          <ScalarProperty Name="DBServerId" ColumnName="DBServerId" />
+          <ScalarProperty Name="DBId" ColumnName="DBId" />
+          <ScalarProperty Name="DBSchemaId" ColumnName="DBSchemaId" />
+          <ScalarProperty Name="DBTableId" ColumnName="DBTableId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="tblDBNames">
+      <EntityTypeMapping TypeName="SQLDataViewerAuthenticationModel.tblDBName">
+        <MappingFragment StoreEntitySet="tblDBName">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="DBName" ColumnName="DBName" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="tblDBSchemas">
+      <EntityTypeMapping TypeName="SQLDataViewerAuthenticationModel.tblDBSchema">
+        <MappingFragment StoreEntitySet="tblDBSchema">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="DBSchema" ColumnName="DBSchema" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="tblDBServers">
+      <EntityTypeMapping TypeName="SQLDataViewerAuthenticationModel.tblDBServer">
+        <MappingFragment StoreEntitySet="tblDBServer">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="DBServer" ColumnName="DBServer" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="tblDBTables">
+      <EntityTypeMapping TypeName="SQLDataViewerAuthenticationModel.tblDBTable">
+        <MappingFragment StoreEntitySet="tblDBTable">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="DBTableOrView" ColumnName="DBTableOrView" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="tblUserInfoes">
+      <EntityTypeMapping TypeName="SQLDataViewerAuthenticationModel.tblUserInfo">
+        <MappingFragment StoreEntitySet="tblUserInfo">
+          <ScalarProperty Name="isActive" ColumnName="isActive" />
+          <ScalarProperty Name="isAdmin" ColumnName="isAdmin" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="UserName" ColumnName="UserName" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

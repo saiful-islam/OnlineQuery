@@ -1,0 +1,27 @@
+﻿@model MIDASDataAnalysis.Models.MapUserConnection
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<fieldset>
+    <legend>MapUserConnection</legend>
+    <br />
+    <div class="display-field">
+        Connection Name : @Html.DisplayFor(model => model.tblConnection.ConnectionName)
+    </div>
+
+   <br />
+    <div class="display-field">
+        User :  @Html.DisplayFor(model => model.tblUserInfo.UserName)
+    </div>
+</fieldset>
+@using (Html.BeginForm()) {
+    <p>
+        <input type="submit" value="Delete" /> |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+}

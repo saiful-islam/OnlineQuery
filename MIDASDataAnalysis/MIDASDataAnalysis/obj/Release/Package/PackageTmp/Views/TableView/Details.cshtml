@@ -1,0 +1,23 @@
+﻿@model MIDASDataAnalysis.Models.tblDBTable
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_PopLayout.cshtml";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>tblDBTable</legend>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.DBTableOrView)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.DBTableOrView)
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

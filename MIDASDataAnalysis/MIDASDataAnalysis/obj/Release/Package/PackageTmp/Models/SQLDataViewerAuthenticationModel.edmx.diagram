@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="740b3741010543b984a705f20cb6745c" Name="Diagram1">
+        <EntityTypeShape EntityType="SQLDataViewerAuthenticationModel.MapUserConnection" Width="1.5" PointX="5.25" PointY="1.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SQLDataViewerAuthenticationModel.tblConnection" Width="1.5" PointX="3" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="SQLDataViewerAuthenticationModel.tblDBName" Width="1.5" PointX="0.75" PointY="1.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SQLDataViewerAuthenticationModel.tblDBSchema" Width="1.5" PointX="0.75" PointY="4.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="SQLDataViewerAuthenticationModel.tblDBServer" Width="1.5" PointX="0.75" PointY="7.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SQLDataViewerAuthenticationModel.tblDBTable" Width="1.5" PointX="0.75" PointY="9.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SQLDataViewerAuthenticationModel.tblUserInfo" Width="1.5" PointX="3" PointY="5.75" IsExpanded="true" />
+        <AssociationConnector Association="SQLDataViewerAuthenticationModel.FK_MapUserConnection_MapConnection" ManuallyRouted="false" />
+        <AssociationConnector Association="SQLDataViewerAuthenticationModel.FK_MapUserConnection_tblUserInfo" ManuallyRouted="false" />
+        <AssociationConnector Association="SQLDataViewerAuthenticationModel.FK_tblAuthentication_tblDBName" ManuallyRouted="false" />
+        <AssociationConnector Association="SQLDataViewerAuthenticationModel.FK_tblAuthentication_tblDBSchema" ManuallyRouted="false" />
+        <AssociationConnector Association="SQLDataViewerAuthenticationModel.FK_tblAuthentication_tblDBServer" ManuallyRouted="false" />
+        <AssociationConnector Association="SQLDataViewerAuthenticationModel.FK_tblAuthentication_tblDBTable" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

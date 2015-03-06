@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title</title>
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width" />
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+</head>
+<body>
+      @Scripts.Render("~/bundles/jquery")
+    @RenderSection("scripts", required: false)
+    <header>
+        <div class="content-wrapper">
+            <div class="float-left">
+                <p class="site-title">@Html.ActionLink("SQL Data Viewer", "Index", "MIDAS")
+
+                </p>
+                <br />
+                    Connection : @Session["ConnectionName"] , State Name: <span id="lblState_Name">  </span>
+            </div>
+            <div class="float-right">
+                <section id="login">
+                    Hello, <span class="username">@User.Identity.Name</span>!
+                </section>
+                <nav>
+                    <ul id="nav">
+                        <li>@Html.ActionLink("Home", "Index", "MIDAS")</li>
+                        <li>@Html.ActionLink("Change Connection", "UserConnection", "MIDAS")</li>
+                        <li>@Html.ActionLink("States", "UserSaveStates", "Connection")</li>
+                        @if (Session["isAdmin"].ToString().ToUpper() == "TRUE")
+                        {
+                            <li><a href="#">Admin</a>
+                                <ul>
+                                    <li>@Html.ActionLink("Connection", "Index", "Connection")</li>
+                                    <li>@Html.ActionLink("User", "Index", "User")</li>
+                                    <li>@Html.ActionLink("Map User Connection", "Index", "MapUsersConnections")</li>
+                                </ul>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    <div id="body">
+        @RenderSection("featured", required: false)
+        <section class="content-wrapper main-content clear-fix">
+            @RenderBody()
+        </section>
+    </div>
+    <footer>
+        <div class="content-wrapper">
+            <div class="float-left">
+                <p>&copy; @DateTime.Now.Year - Ims Health,Dhaka</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+        $(document).ready(function () {
+            $("#nav li").hover(
+            function () {
+                $(this).children('ul').hide();
+                $(this).children('ul').slideDown('fast');
+            },
+            function () {
+                $('ul', this).slideUp('fast');
+            });
+        });
+    </script>
+  @*  @Scripts.Render("~/bundles/jquery")
+    @RenderSection("scripts", required: false)*@
+</body>
+</html>
+
